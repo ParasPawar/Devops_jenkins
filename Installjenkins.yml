@@ -1,1 +1,39 @@
-
+---
+- hosts: all
+  become: yes
+  become_method: sudo
+  vars:
+          data:
+                  - openjdk-8-jdk
+                  - git
+                  - wget
+                  - rpm
+                  
+  tasks:
+          - name: udate index
+            apt:
+                    update_cache: yes
+          
+          - name: install dependencies
+            package:
+                    name: "{{item}}"
+                    state: present
+            with_items: "{{data}}"
+         
+          - name: download jenkins repo
+            command: sudo sh -c 'echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
+          - name: import key
+            apt_key:
+                    url: https://pkg.jenkins.io/debian/jenkins.io.key
+                    state: present
+          - name: install jenkins
+            apt:
+                    name: "jenkins"
+                    state: present
+                    update_cache: yes
+          - name: allow port 8080
+            shell: iptables -I INPUT -p tcp --dport 8080 -m state --state NEW,ESTABLISHED -j ACCEPT
+          - name: start server
+            service:
+                    name: jenkins
+                    state: started
