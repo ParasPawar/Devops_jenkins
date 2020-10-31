@@ -1,0 +1,29 @@
+---
+- hosts: all
+  become: yes
+  vars:
+          data: ["group-a", "group-b"]
+  tasks:
+          - name: add group
+            group:
+                    name: "{{item}}"
+                    state: present
+            with_items: "{{data}}"
+- hosts: all
+  become: yes
+  vars:
+          data: ["user1", "user2"]
+          data1: ["user3", "user4"]
+  tasks:
+          - name: add user to group a
+            user:
+                    name: "{{item}}"
+                    group: group-a
+            with_items: "{{data}}"
+          - name: add user to group b
+            user:
+                    name: "{{item}}"
+                    group: group-b
+            with_items: "{{data1}}"
+         
+
