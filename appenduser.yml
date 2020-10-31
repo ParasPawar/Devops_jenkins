@@ -1,0 +1,17 @@
+---
+- hosts: all
+  become: yes
+  vars:
+          data:
+                  - user1
+                  - user2
+                  - user3
+                  - user4
+  tasks:
+          - name: append user
+            user:
+                    name: "{{item}}"
+                    append: yes
+                    group: admin
+            with_items: "{{data}}"
+            
