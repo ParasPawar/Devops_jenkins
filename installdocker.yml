@@ -1,0 +1,38 @@
+---
+- hosts: all
+  become: yes
+  become_method: sudo
+  vars:
+          data:
+                  - apt-transport-https
+                  - ca-certificates
+                  - curl
+                  - gnupg2
+                  - software-properties-common
+  tasks:
+          - name: update index
+            apt:
+                    update_cache: yes
+          - name: add dependencies
+            package:
+                    name: "{{item}}"
+                    state: present
+                    update_cache: yes
+            with_items: "{{data}}"
+          - name: add gpg key
+            apt_key:
+                    url: https://download.docker.com/linux/ubuntu/gpg
+          - name: add apt repo
+            apt_repository:
+                    repo: deb [arch=amd64] https://download.docker.com/linux/{{ansible_distribution|lower}} {{ansible_distribution_release}} stable
+          - name: install docker
+            package:
+                    name: "{{item}}"
+                    state: present
+                    update_cache: yes
+            with_items:
+                    - docker-ce
+                    - docker-ce-cli
+                    - containerd.io
+                    - docker-compose
+                      
